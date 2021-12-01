@@ -1,0 +1,62 @@
+#!/usr/bin/env node
+
+const fs = require('fs');
+const path = require('path');
+
+let fileArg = process.argv[2];
+if (fileArg.endsWith('.')) {
+  fileArg = fileArg.substr(0, fileArg.length - 1);
+}
+if (!fileArg.endsWith('.js')) {
+  fileArg += '.js';
+}
+
+global.loadInput = () => {
+  const primaryInput = path.resolve(__dirname, fileArg.replace('.js', '.in'));
+  const secondaryInput = path.resolve(__dirname, path.dirname(fileArg), 'first.in');
+  if (fs.existsSync(primaryInput)) return fs.readFileSync(primaryInput, 'utf8');
+  if (fs.existsSync(secondaryInput)) return fs.readFileSync(secondaryInput, 'utf8');
+  throw new Error('Failed to find input file for current run');
+};
+
+String.prototype.lines = function () {
+  return this.split('\n');
+};
+
+String.prototype.blocks = function () {
+  return this.split('\n\n').map((b) => b.split('\n'));
+};
+
+String.prototype.reverse = function () {
+  return this.split('').reverse().join('');
+};
+
+Array.prototype.toInts = function () {
+  return this.map((i) => parseInt(i, 10));
+};
+
+String.prototype.int = function () {
+  return parseInt(this, 10);
+};
+
+Math.expMod = (a, b, n) => {
+  a = a % n;
+  let result = 1n;
+  let x = a;
+
+  while (b > 0n) {
+    let lsb = b % 2n;
+    b = b / 2n;
+
+    if (lsb == 1n) {
+      result = result * x;
+      result = result % n;
+    }
+
+    x = x * x;
+    x = x % n;
+  }
+  return result;
+};
+
+require(path.resolve(__dirname, fileArg));

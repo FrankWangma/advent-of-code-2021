@@ -1,63 +1,97 @@
 const input = global
   .loadInput()
-  .lines()
-  let co2 = input;
-  let oxygen = input;
-  
-  let count = 0;
-  while(count != input[0].length) {
-    oxygen = reduceArray(oxygen, count, true);
-    count++;
-  }
+  .blocks()
 
+var BreakException = {};
+let nums = input[0][0].toString().split(',')
+input.splice(0,1);
 
-  count = 0;
-  while(count != input[0].length) {
-    co2 = reduceArray(co2, count, false);
-    count++;
-  }
+numArray = input.map(block => 
+  block = block.map(line => 
+    line.split(' ').map(i => {
+      return i.int();
+    }).filter(x => 
+      !Number.isNaN(x)
+    )
+  )
+)
 
-  console.log(parseInt(oxygen,2) *parseInt(co2,2));
+let winningBlock = [];
+let winningNum = -1;
+let sum = 0;
+let remainingIndex = [...Array(input.length).keys()]
 
-
-
-function reduceArray(arr, index, isOxygen) {
-  let count = 0;
-  if(arr.length == 1) {
-    return arr;
-  }
-  
-  arr.map(i => {
-    if(i[index] == 1) {
-      count++;
+firstFor:
+for(const num of nums) {
+  index = 0;
+  for(const block of numArray) {
+    if(remainingIndex.includes(index)) {
+      for ( const line of block) {
+        if(line.includes(parseInt(num, 10))) {
+          line[line.indexOf(parseInt(num, 10))] = -1;
+        };
+      }
+      if(bingoCheck(block)) {
+        if(remainingIndex.length == 1) {
+          winningBlock = numArray[remainingIndex[0]];
+          winningNum = num;
+          break firstFor;
+        }
+        remainingIndex.splice(remainingIndex.indexOf(index), 1);
+      }
     }
-    return i;
-  })
-  
-  let replace
-  
-  if(count >= arr.length / 2) {
-    replace = '1'
-  } else {
-    replace = '0'
-  }
-  
-  if(isOxygen) {
-    let oxygen = arr.reduce(function (r, v) {
-      if (v[index] == replace) {
-          r.push(v);
+    index++;
+  };
+};
+
+for(let i = 0; i < winningBlock.length; i++) {
+  for(var j=0; j < winningBlock[i].length; j++) {
+      if(winningBlock[i][j] !== -1) {
+        sum += winningBlock[i][j]
       }
-      return r;
-    }, []);
-    return oxygen
-  } else {
-    let co2 = arr.reduce(function (r, v) {
-      if (v[index] != replace) {
-          r.push(v);
-      }
-      return r;
-    }, []);
-    
-    return co2;
   }
+}
+
+console.log(sum * winningNum);
+
+
+function bingoCheck(bingo) {
+ // check for all values equals to 1 in any horizontal row:
+ for (var i = 0; i < bingo.length; i++)
+ {
+   winner = true;
+
+   for(var j=0; j < bingo[i].length; j++)
+   {
+     if(bingo[i][j] != -1)
+     {
+       winner=false;
+       break;
+     }
+   }
+
+   if(winner) {
+     return true;
+   }
+ }
+
+ for (var i = 0; i < bingo.length; i++)
+ {
+   winner = true;
+   for(var j=0; j < bingo[i].length; j++)
+   {
+     if(bingo[j][i] != -1)
+     {
+       winner=false;
+       break;
+     }
+   }
+
+   if(winner){
+    [true, -1, i]
+     return true;
+   }
+ }
+
+    return false;
 }

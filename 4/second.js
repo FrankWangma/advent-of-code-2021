@@ -2,7 +2,6 @@ const input = global
   .loadInput()
   .blocks()
 
-var BreakException = {};
 let nums = input[0][0].toString().split(',')
 input.splice(0,1);
 
